@@ -40,6 +40,14 @@
 				{fbvElement type="text" id="customStyleInput" name="customStyleInput" disabled=true label="plugins.generic.jatsParser.style.label"}
 			{/if}
 		{/fbvFormSection}
+
+		{fbvFormSection title="Estilo del cuerpo del texto" description="Configura el estilo del contenido renderizado (fuente, tamaño, color, interlineado)"}
+			{fbvElement type="text" id="fontFamily" name="fontFamily" value=$fontFamily label="Fuente (ej: Arial, Times New Roman)" size="MEDIUM"}
+			{fbvElement type="text" id="fontSize" name="fontSize" value=$fontSize label="Tamaño de fuente (ej: 14px, 1em)" size="SMALL"}
+			{fbvElement type="text" id="fontColor" name="fontColor" value=$fontColor label="Color de fuente (ej: #000000, red)" size="SMALL"}
+			{fbvElement type="text" id="lineHeight" name="lineHeight" value=$lineHeight label="Interlineado (ej: 1.5, 150%)" size="SMALL"}
+		{/fbvFormSection}
+		
 	{/fbvFormArea}
 
     {fbvFormArea id="jatsParserGalleyImport" title="plugins.generic.jatsParser.galley.import"}

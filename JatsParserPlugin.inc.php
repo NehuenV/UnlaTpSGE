@@ -36,7 +36,6 @@ class JatsParserPlugin extends GenericPlugin {
 				HookRegistry::register('Schema::get::publication', array($this, 'addToSchema'));
 				HookRegistry::register('LoadHandler', array($this, 'loadFullTextAssocHandler'));
 				HookRegistry::register('Publication::edit', array($this, 'editPublicationFullText'));
-				//HookRegistry::register('Templates::Article::Main', array($this, 'displayFullText'));
 				HookRegistry::register('Templates::Article::JatsParserFullText', array($this, 'displayFullText')); // Added by UNLa
 				HookRegistry::register('TemplateManager::display', array($this, 'themeSpecificStyles'));
 				HookRegistry::register('Form::config::before', array($this, 'addCitationsFormFields'));
@@ -672,6 +671,7 @@ class JatsParserPlugin extends GenericPlugin {
 		return $htmlDocument;
 	}
 
+	
 	/**
 	 * @param string $hookname
 	 * @param array $args
@@ -723,6 +723,41 @@ class JatsParserPlugin extends GenericPlugin {
 			$html = $this->_setSupplImgPath($submissionFile, $html);
 		}
 
+
+		$plugin = PluginRegistry::getPlugin('generic', 'jatsparserplugin');
+    $context = Application::get()->getRequest()->getContext();
+    $contextId = $context->getId();
+
+    $fontFamily = $plugin->getSetting($contextId, 'fontFamily');
+    $fontSize = $plugin->getSetting($contextId, 'fontSize') ;
+    $fontColor = $plugin->getSetting($contextId, 'fontColor');
+    $lineHeight = $plugin->getSetting($contextId, 'lineHeight');
+
+    // ** NUEVO: Generar el CSS y prependerlo al HTML **
+    $cssToInject = ''; // Inicializamos la variable para el CSS
+    if ($fontFamily || $fontSize || $fontColor || $lineHeight) {
+        $cssToInject = '<style>';
+        // IMPORTANTE: Usa el selector EXACTO que aparece en el HTML.
+        // Según tu última captura de Styles, es '.jatsParser-article-fulltext p'.
+        // Pero tu template usa 'jatsParser__article-fulltext'.
+        // ¡Necesitas usar la que realmente esté en el div padre del HTML final!
+        // Voy a asumir que tu div es jatsParser__article-fulltext como en tu tpl
+        $cssToInject .= ".jatsParser__article-fulltext p {"; // Usamos la clase de tu div contenedor
+
+        if ($fontFamily) $cssToInject .= "font-family: \"{$fontFamily}\" !important;"; // Comillas para fuentes con espacios
+        if ($fontSize) $cssToInject .= "font-size: {$fontSize} !important;";
+        if ($fontColor) $cssToInject .= "color: {$fontColor} !important;";
+        if ($lineHeight) $cssToInject .= "line-height: {$lineHeight} !important;";
+        $cssToInject .= "}";
+        $cssToInject .= '</style>';
+    }
+
+    // Prependemos el CSS generado al inicio del HTML del contenido
+    // Esto hace que el <style> se cargue dentro de <div class="jatsParser__article-fulltext">
+    $html = $cssToInject . $html;
+
+
+
 		$templateMgr->assign('fullText', $html);
 		$output .= $templateMgr->fetch($this->getTemplateResource('articleMainView.tpl'));
 
@@ -750,6 +785,7 @@ class JatsParserPlugin extends GenericPlugin {
 		$genreDao = DAORegistry::getDAO('GenreDAO');
 		foreach ($dependentFilesIterator as $dependentFile) {
 			$genre = $genreDao->getById($dependentFile->getData('genreId'));
+
 			if ($genre->getCategory() !== GENRE_CATEGORY_ARTWORK) continue; // only art works are supported
 			if (!in_array($dependentFile->getData('mimetype'), self::getSupportedSupplFileTypes())) continue; // check if MIME type is supported
 			$submissionId = $submissionFile->getData('submissionId');
@@ -770,6 +806,7 @@ class JatsParserPlugin extends GenericPlugin {
 				if (empty($imageFileName)) continue;
 				if (array_key_exists($imageFileName, $imageFiles)) continue;
 				$imageFiles[$imageFileName] = $filePath;
+				
 			}
 		}
 

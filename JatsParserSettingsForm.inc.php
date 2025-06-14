@@ -48,13 +48,18 @@ class JatsParserSettingsForm extends Form {
 
 		$this->setData('convertToPdf', $plugin->getSetting($contextId, 'convertToPdf'));
 		$this->setData('citationStyle', $plugin->getSetting($contextId, 'citationStyle'));
+		$this->setData('fontFamily', $plugin->getSetting($contextId, 'fontFamily'));
+		$this->setData('fontSize', $plugin->getSetting($contextId, 'fontSize'));
+		$this->setData('fontColor', $plugin->getSetting($contextId, 'fontColor'));
+		$this->setData('lineHeight', $plugin->getSetting($contextId, 'lineHeight'));
 	}
 
 	/**
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('convertToPdf', 'citationStyle', 'customStyleInput', 'galleysImport'));
+		$this->readUserVars(array('convertToPdf', 'citationStyle', 'customStyleInput', 'galleysImport','fontFamily',
+    	'fontSize', 'fontColor', 'lineHeight'));
 	}
 
 	/**
@@ -97,7 +102,10 @@ class JatsParserSettingsForm extends Form {
 		if ($importGalleys = $this->getData('galleysImport')) {
 			$plugin->importGalleys();
 		}
-
+		$plugin->updateSetting($contextId, 'fontFamily', $this->getData('fontFamily'));
+		$plugin->updateSetting($contextId, 'fontSize', $this->getData('fontSize'));
+		$plugin->updateSetting($contextId, 'fontColor', $this->getData('fontColor'));
+		$plugin->updateSetting($contextId, 'lineHeight', $this->getData('lineHeight'));
 		parent::execute(...$functionArgs);
 	}
 }

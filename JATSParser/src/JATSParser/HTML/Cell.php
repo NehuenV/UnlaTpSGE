@@ -48,6 +48,11 @@ class Cell extends \DOMElement {
 				case "JATSParser\Body\Text":
 					HTMLText::extractText($cellContents, $this);
 					break;
+				case "JATSParser\Body\InlineGraphic":
+					$fragment = $this->ownerDocument->createDocumentFragment();
+					$fragment->appendXML($cellContents->toHTML());
+					$this->appendChild($fragment);
+					break;
 			}
 		}
 	}

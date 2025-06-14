@@ -30,12 +30,14 @@ class Cell extends AbstractElement {
 		parent::__construct($cellNode);
 		
 		$this->type = $cellNode->nodeName;
-
 		$content = array();
 		$xpath = Document::getXpath();
 		$childNodes = $xpath->query("child::node()", $cellNode);
 		foreach ($childNodes as $childNode) {
-			if ($childNode->nodeName === "p") {
+			if ($childNode->nodeName === 'img') {
+				$inlineGraphic = new InlineGraphic($childNode);
+				$content[] = $inlineGraphic;
+			}else  if ($childNode->nodeName === "p") {
 				$par = new Par($childNode);
 				$content[] = $par;
 			} else {

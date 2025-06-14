@@ -32,7 +32,7 @@ class Document {
 		$document = new \DOMDocument;
 		$this->document = $document->load($documentPath);
 		self::$xpath = new \DOMXPath($document);
-
+		error_log('DEBUG: displayFullText - Contenido de document:');
 		$this->extractContent();
 		$this->extractReferences();
 	}
